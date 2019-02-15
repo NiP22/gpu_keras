@@ -17,7 +17,7 @@ class CoolerGenerator(utils.Sequence):
         if self.batch_size*item > len(self.x):
             last_index = len(self.x)
         else:
-            last_index = (self.batch_size + 1)*item
+            last_index = self.batch_size*(item + 1)
         sample = self.x[first_index:last_index]
         sample = sample.reshape((sample.shape[0], sample.shape[1], 1))
         targets = self.y[first_index:last_index]
