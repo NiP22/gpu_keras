@@ -4,7 +4,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from keras.models import Sequential
 from keras import layers
-import time
 
 
 class CoolerGenerator(utils.Sequence):
@@ -14,23 +13,14 @@ class CoolerGenerator(utils.Sequence):
         self.batch_size = batch_size
 
     def __getitem__(self, item):
-        t0 = time.clock()
-
-        first_index = self.batch_size * item
-        if self.batch_size * item > len(self.x):
+        first_index = self.batch_size*item
+        if self.batch_size*item > len(self.x):
             last_index = len(self.x)
         else:
-            last_index = self.batch_size * (item + 1)
+            last_index = self.batch_size*(item + 1)
         sample = self.x[first_index:last_index]
-        st0 = time.clock()
-        #sample = sample.reshape((sample.shape[0], sample.shape[1], 1))
-        st1 = time.clock()
+        sample = sample.reshape((sample.shape[0], sample.shape[1], 1))
         targets = self.y[first_index:last_index]
-        #print(sample)
-        #print(sample.shape)
-        t1 = time.clock()
-        print("time for all: ", (t1 - t0))
-        print("time for reshape: ", 100000*(st1 - st0))
         return sample, targets
 
     def __len__(self):
@@ -102,11 +92,6 @@ if __name__ == '__main__':
     train_x, train_y = split_sequence(temperature[:350000], n_steps)
     val_x, val_y = split_sequence(temperature[350000:], n_steps)
     batch_size = 150
-    val_x = val_x.reshape((val_x.shape[0], val_x.shape[1], 1))
-    print(train_x.shape)
-    print(train_x)
-    train_x = train_x.reshape((train_x.shape[0], train_x.shape[1], 1))
-    print(train_x.shape)
     train_generator = CoolerGenerator(train_x, train_y, batch_size)
     validation_generator = CoolerGenerator(val_x, val_y, batch_size)
     model = Sequential()
@@ -116,7 +101,7 @@ if __name__ == '__main__':
     history = model.fit_generator(generator=train_generator,
                                   epochs=20,
                                   validation_data=validation_generator,
-                                  workers=8,
+                                  workers=10,
                                   use_multiprocessing=True)
 
     loss = history.history['loss']
@@ -132,4 +117,3 @@ if __name__ == '__main__':
     plt.legend()
 
     plt.show()
-
